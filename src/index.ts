@@ -5,15 +5,54 @@ const app = new Hono();
 type Vegetable = {
   id: number;
   name: string;
+  classification: string;
+  createdAt: string;
+  updatedAt?: string | null;
 };
 
 let vegetables: Vegetable[] = [
-  { id: 1, name: "Carrot" },
-  { id: 2, name: "Tomato" },
-  { id: 3, name: "Lettuce" },
-  { id: 4, name: "Pumkin" },
-  { id: 5, name: "Okra" },
-  { id: 6, name: "Cucumber" },
+  {
+    id: 1,
+    name: "Carrot",
+    classification: "Roots",
+    createdAt: new Date().toISOString(),
+    updatedAt: null,
+  },
+  {
+    id: 2,
+    name: "Tomato",
+    classification: "Fruits",
+    createdAt: new Date().toISOString(),
+    updatedAt: null,
+  },
+  {
+    id: 3,
+    name: "Lettuce",
+    classification: "Leaves",
+    createdAt: new Date().toISOString(),
+    updatedAt: null,
+  },
+  {
+    id: 4,
+    name: "Pumkin",
+    classification: "Fruits",
+    createdAt: new Date().toISOString(),
+    updatedAt: null,
+  },
+  {
+    id: 5,
+    name: "Okra",
+    classification: "Fruits",
+    createdAt: new Date().toISOString(),
+    updatedAt: null,
+  },
+  {
+    id: 6,
+    name: "Cucumber",
+    classification: "Fruits",
+    createdAt: new Date().toISOString(),
+    updatedAt: null,
+  },
 ];
 
 app.get("/", (c) => {
@@ -46,7 +85,12 @@ app.post("/vegetables", async (c) => {
 
   const newVegetables = [
     ...vegetables,
-    { ...body, id: vegetables[vegetables.length - 1].id + 1 },
+    {
+      ...body,
+      id: vegetables[vegetables.length - 1].id + 1,
+      createdAt: new Date().toISOString(),
+      updatedAt: null,
+    },
   ];
 
   vegetables = newVegetables;
@@ -82,16 +126,18 @@ app.delete("/vegetables/:id", async (c) => {
 app.patch("/vegetables/:id", async (c) => {
   const id = Number(c.req.param("id"));
 
-  const index = vegetables.findIndex((v) => v.id === id);
+  const foundVegetable = vegetables.find((vegetable) => vegetable.id === id);
 
-  if (index === -1) {
+  if (!foundVegetable) {
     return c.json({ message: "Vegetable not found" }, 404);
   }
 
   const body = await c.req.json();
 
   const updatedVegetables = vegetables.map((vegetable) =>
-    vegetable.id === id ? { ...body, id: id } : vegetable
+    vegetable.id === id
+      ? { ...vegetable, ...body, updatedAt: new Date().toISOString() }
+      : vegetable
   );
 
   vegetables = updatedVegetables;
@@ -104,10 +150,15 @@ app.put("/vegetables/:id", async (c) => {
   const id = Number(c.req.param("id"));
   const body = await c.req.json();
 
-  const index = vegetables.findIndex((v) => v.id === id);
+  const foundVegetable = vegetables.find((vegetable) => vegetable.id === id);
 
-  if (index === -1) {
-    const newVegetable = { id: id, ...body };
+  if (!foundVegetable) {
+    const newVegetable = {
+      ...body,
+      id: id,
+      createdAt: new Date().toISOString(),
+      updatedAt: null,
+    };
 
     vegetables = [...vegetables, newVegetable];
 
@@ -118,7 +169,13 @@ app.put("/vegetables/:id", async (c) => {
   }
 
   const updatedVegetables = vegetables.map((vegetable) =>
-    vegetable.id === id ? { ...body, id: id } : vegetable
+    vegetable.id === id
+      ? {
+          ...vegetable,
+          ...body,
+          updatedAt: new Date().toISOString(),
+        }
+      : vegetable
   );
 
   vegetables = updatedVegetables;
