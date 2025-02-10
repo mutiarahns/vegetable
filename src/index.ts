@@ -83,6 +83,15 @@ app.get("/vegetables/:id", (c) => {
 app.post("/vegetables", async (c) => {
   const body = await c.req.json();
 
+  const foundVegetable = vegetables.find(
+    (vegetable) =>
+      vegetable.name.toLocaleLowerCase === body.name.toLocaleLowerCase
+  );
+
+  if (foundVegetable) {
+    return c.json({ message: "Vegetable already exists" }, 409);
+  }
+
   const newVegetables = [
     ...vegetables,
     {
@@ -109,9 +118,11 @@ app.delete("/vegetables", (c) => {
 app.delete("/vegetables/:id", async (c) => {
   const id = c.req.param("id");
 
-  const index = vegetables.findIndex((v) => v.id === Number(id));
+  const foundVegetable = vegetables.find(
+    (vegetable) => vegetable.id === Number(id)
+  );
 
-  if (index === -1) {
+  if (!foundVegetable) {
     return c.json({ message: "Vegetable not found" }, 404);
   }
 
