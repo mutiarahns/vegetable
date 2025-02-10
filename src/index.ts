@@ -57,7 +57,7 @@ let vegetables: Vegetable[] = [
 
 app.get("/", (c) => {
   return c.json({
-    message: "Hello World",
+    message: "Vegetable API",
   });
 });
 
@@ -81,30 +81,29 @@ app.get("/vegetables/:id", (c) => {
 
 // Create a new vegetable
 app.post("/vegetables", async (c) => {
-  const body = await c.req.json();
+  const body: Omit<Vegetable, "id" | "createdAt" | "updatedAt"> =
+    await c.req.json();
 
   const foundVegetable = vegetables.find(
-    (vegetable) =>
-      vegetable.name.toLocaleLowerCase === body.name.toLocaleLowerCase
+    (vegetable) => vegetable.name.toLowerCase() === body.name.toLowerCase()
   );
 
   if (foundVegetable) {
     return c.json({ message: "Vegetable already exists" }, 409);
   }
 
-  const newVegetables = [
-    ...vegetables,
-    {
-      ...body,
-      id: vegetables[vegetables.length - 1].id + 1,
-      createdAt: new Date().toISOString(),
-      updatedAt: null,
-    },
-  ];
+  const newVegetable = {
+    id: vegetables[vegetables.length - 1].id + 1,
+    ...body,
+    createdAt: new Date().toISOString(),
+    updatedAt: null,
+  };
+
+  const newVegetables = [...vegetables, newVegetable];
 
   vegetables = newVegetables;
 
-  return c.json(vegetables);
+  return c.json(newVegetable);
 });
 
 // Delete all vegetables
@@ -130,7 +129,10 @@ app.delete("/vegetables/:id", async (c) => {
 
   vegetables = newVegetables;
 
-  return c.json({ message: "Vegetable deleted", newVegetables });
+  return c.json({
+    message: "Vegetable deleted",
+    data: foundVegetable,
+  });
 });
 
 // Update a vegetable by id
@@ -145,15 +147,19 @@ app.patch("/vegetables/:id", async (c) => {
 
   const body = await c.req.json();
 
+  const updatedVegetable = {
+    ...foundVegetable,
+    ...body,
+    updatedAt: new Date().toISOString(),
+  };
+
   const updatedVegetables = vegetables.map((vegetable) =>
-    vegetable.id === id
-      ? { ...vegetable, ...body, updatedAt: new Date().toISOString() }
-      : vegetable
+    vegetable.id === id ? updatedVegetable : vegetable
   );
 
   vegetables = updatedVegetables;
 
-  return c.json({ updatedVegetables });
+  return c.json(updatedVegetable);
 });
 
 // Update a vegetable by id, create if not exists
