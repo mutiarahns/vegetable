@@ -185,19 +185,19 @@ app.put("/vegetables/:id", async (c) => {
     });
   }
 
+  const updatedVegetable = {
+    ...foundVegetable,
+    ...body,
+    updatedAt: new Date().toISOString(),
+  };
+
   const updatedVegetables = vegetables.map((vegetable) =>
-    vegetable.id === id
-      ? {
-          ...vegetable,
-          ...body,
-          updatedAt: new Date().toISOString(),
-        }
-      : vegetable
+    vegetable.id === id ? updatedVegetable : vegetable
   );
 
   vegetables = updatedVegetables;
 
-  return c.json({ updatedVegetables });
+  return c.json(updatedVegetable);
 });
 
 export default app;
