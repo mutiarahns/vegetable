@@ -29,3 +29,9 @@ bun dev
 ```
 
 Open http://localhost:3000
+
+## ERD
+
+ERD created with [dbdiagram.io](https://dbdiagram.io)
+
+![img](src/assets/database-erd.png)

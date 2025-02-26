@@ -1,14 +1,7 @@
 import { Hono } from "hono";
+import { Vegetable } from "./types/vegetables";
 
 const app = new Hono();
-
-type Vegetable = {
-  id: number;
-  name: string;
-  classification: string;
-  createdAt: string;
-  updatedAt?: string | null;
-};
 
 let vegetables: Vegetable[] = [
   {
